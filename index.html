@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -9,1206 +8,455 @@
   <meta name="apple-mobile-web-app-title" content="PS4 PKG" />
   <meta name="theme-color" content="#0a0a0f" />
   <title>PS4 PKG Installer</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet" />
-
   <style>
     :root {
-      --bg:       #0a0a0f;
-      --surface:  #111118;
-      --border:   #1e1e2e;
-      --accent:   #00e5ff;
-      --accent2:  #ff3c6e;
-      --text:     #e8e8f0;
-      --muted:    #555570;
-      --success:  #00ff88;
-      --warn:     #ffcc00;
-      --mono:     'Share Tech Mono', monospace;
-      --sans:     'Barlow', sans-serif;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bot: env(safe-area-inset-bottom, 0px);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--sans);
-      overscroll-behavior: none;
-      -webkit-text-size-adjust: 100%;
-    }
-
-    body {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      min-height: -webkit-fill-available;
-      padding-top: var(--safe-top);
-      padding-bottom: var(--safe-bot);
-    }
-
-    /* ── Scanline overlay ── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,229,255,.018) 2px,
-        rgba(0,229,255,.018) 4px
-      );
-      pointer-events: none;
-      z-index: 1000;
-    }
-
-    /* ── Header ── */
-    header {
-      padding: 20px 24px 12px;
-      border-bottom: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
-    }
-    header::after {
-      content: '';
-      position: absolute;
-      bottom: -1px; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    }
-    .header-top {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 4px;
-    }
-    .logo {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--mono);
-      font-size: 14px;
-      font-weight: bold;
-      color: var(--bg);
-      flex-shrink: 0;
-      box-shadow: 0 0 16px rgba(0,229,255,.4);
-    }
-    h1 {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: .5px;
-      line-height: 1.2;
-    }
-    h1 span { color: var(--accent); }
-    .subtitle {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--muted);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding-left: 48px;
-    }
-
-    /* ── Main scroll area ── */
-    main {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 24px 20px 120px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* ── Cards ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px;
-      position: relative;
-      overflow: hidden;
-    }
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--accent), transparent);
-    }
-    .card.accent2::before { background: linear-gradient(90deg, var(--accent2), transparent); }
-
-    .card-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .card-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-    .card.accent2 .card-label { color: var(--accent2); }
-
-    /* ── Inputs ── */
-    .field { margin-bottom: 14px; }
-    .field:last-child { margin-bottom: 0; }
-
-    label {
-      display: block;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .input-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    input[type="text"], input[type="url"], input[type="number"] {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 14px;
-      padding: 12px 14px;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(0,229,255,.15);
-    }
-    input::placeholder { color: var(--muted); opacity: .7; }
-
-    .input-suffix {
-      position: absolute;
-      right: 12px;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--muted);
-      pointer-events: none;
-    }
-
-    .ip-row {
-      display: grid;
-      grid-template-columns: 1fr 80px;
-      gap: 8px;
-    }
-
-    /* ── Buttons ── */
-    .btn {
-      width: 100%;
-      border: none;
-      border-radius: 10px;
-      font-family: var(--sans);
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: .5px;
-      padding: 15px;
-      cursor: pointer;
-      transition: transform .1s, opacity .2s, box-shadow .2s;
-      -webkit-tap-highlight-color: transparent;
-      position: relative;
-      overflow: hidden;
-    }
-    .btn:active { transform: scale(.97); }
-    .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent) 0%, #0099bb 100%);
-      color: var(--bg);
-      box-shadow: 0 4px 20px rgba(0,229,255,.3);
-    }
-    .btn-primary:not(:disabled):hover {
-      box-shadow: 0 4px 28px rgba(0,229,255,.5);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
-    .btn-secondary:active { background: rgba(255,255,255,.04); }
-
-    .btn-danger {
-      background: linear-gradient(135deg, var(--accent2) 0%, #bb0033 100%);
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(255,60,110,.25);
-    }
-
-    /* ripple */
-    .btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, rgba(255,255,255,.25) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity .3s;
-      pointer-events: none;
-    }
-    .btn.ripple::after { opacity: 1; }
-
-    /* ── Status terminal ── */
-    .terminal {
-      background: #070710;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-      font-family: var(--mono);
-      font-size: 12px;
-      line-height: 1.7;
-      min-height: 90px;
-      max-height: 220px;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .terminal-bar {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-    .terminal-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-    }
-    .terminal-dot.red   { background: #ff5f57; }
-    .terminal-dot.yellow{ background: #febc2e; }
-    .terminal-dot.green { background: #28c840; }
-    .terminal-title {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--muted);
-      margin-left: auto;
-      letter-spacing: 1px;
-    }
-
-    .log-line { display: block; animation: fadeIn .2s ease; }
-    .log-ok   { color: var(--success); }
-    .log-err  { color: var(--accent2); }
-    .log-warn { color: var(--warn); }
-    .log-info { color: var(--accent); }
-    .log-muted{ color: var(--muted); }
-
-    @keyframes fadeIn { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform: none; } }
-
-    /* ── Pulse indicator ── */
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      font-family: var(--mono);
-      font-size: 11px;
-      padding: 5px 10px;
-      border-radius: 100px;
-      border: 1px solid var(--border);
-      margin-bottom: 14px;
-    }
-    .pulse-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--muted);
-      flex-shrink: 0;
-    }
-    .pulse-dot.active {
-      background: var(--success);
-      animation: pulse 1.2s infinite;
-    }
-    .pulse-dot.error { background: var(--accent2); }
-    @keyframes pulse {
-      0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(0,255,136,.5); }
-      50%      { opacity:.8; box-shadow: 0 0 0 5px rgba(0,255,136,0); }
-    }
-
-    /* ── Progress bar ── */
-    .progress-wrap {
-      display: none;
-      margin-top: 14px;
-    }
-    .progress-wrap.show { display: block; }
-    .progress-label {
-      display: flex;
-      justify-content: space-between;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .progress-track {
-      height: 4px;
-      background: var(--border);
-      border-radius: 100px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      border-radius: 100px;
-      background: linear-gradient(90deg, var(--accent), var(--success));
-      width: 0%;
-      transition: width .4s ease;
-    }
-    .progress-fill.indeterminate {
-      width: 40% !important;
-      animation: indeterminate 1.4s ease-in-out infinite;
-    }
-    @keyframes indeterminate {
-      0%   { transform: translateX(-200%); }
-      100% { transform: translateX(400%); }
-    }
-
-    /* ── Multi-PKG list ── */
-    .pkg-list { display: flex; flex-direction: column; gap: 8px; }
-    .pkg-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
-    }
-    .pkg-item-num {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--muted);
-      min-width: 20px;
-    }
-    .pkg-item-url {
-      flex: 1;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text);
-      word-break: break-all;
-      line-height: 1.4;
-    }
-    .pkg-remove {
-      background: none;
-      border: none;
-      color: var(--accent2);
-      font-size: 18px;
-      cursor: pointer;
-      padding: 4px;
-      line-height: 1;
-      flex-shrink: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .add-pkg-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: end;
-    }
-    .btn-add {
-      background: var(--border);
-      border: none;
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 20px;
-      width: 46px;
-      height: 46px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      -webkit-tap-highlight-color: transparent;
-      transition: background .2s;
-    }
-    .btn-add:active { background: var(--accent); color: var(--bg); }
-
-    /* ── Method selector ── */
-    .method-tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .method-tab {
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      font-family: var(--mono);
-      font-size: 11px;
-      text-align: center;
-      cursor: pointer;
-      transition: all .2s;
-      -webkit-tap-highlight-color: transparent;
-      line-height: 1.4;
-    }
-    .method-tab.active {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(0,229,255,.08);
-    }
-    .method-tab .port-badge {
-      display: block;
-      font-size: 9px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-    .method-tab.active .port-badge { color: rgba(0,229,255,.6); }
-
-    /* ── History ── */
-    .hist-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin-bottom: 8px;
-      cursor: pointer;
-      background: var(--bg);
-      transition: border-color .2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .hist-item:last-child { margin-bottom: 0; }
-    .hist-item:active { border-color: var(--accent); }
-    .hist-icon { color: var(--accent); font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-    .hist-text { flex: 1; }
-    .hist-ip { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-bottom: 2px; }
-    .hist-url { font-family: var(--mono); font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
-    .hist-del { background:none; border:none; color:var(--muted); font-size:16px; cursor:pointer; padding:2px; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
-
-    .empty-hist { text-align: center; color: var(--muted); font-family: var(--mono); font-size: 12px; padding: 20px 0; }
-
-    /* ── Accordion / Settings ── */
-    .accordion-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      padding: 2px 0;
-    }
-    .accordion-header .chevron {
-      font-size: 16px;
-      color: var(--muted);
-      transition: transform .3s;
-    }
-    .accordion-header.open .chevron { transform: rotate(180deg); }
-    .accordion-body {
-      display: none;
-      padding-top: 14px;
-    }
-    .accordion-body.open { display: block; }
-
-    /* ── Toggle switch ── */
-    .toggle-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .toggle-row:last-child { border-bottom: none; }
-    .toggle-label { font-size: 13px; color: var(--text); }
-    .toggle-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .toggle {
-      position: relative;
-      width: 44px; height: 26px;
-      flex-shrink: 0;
-    }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute; inset: 0;
-      background: var(--border);
-      border-radius: 100px;
-      cursor: pointer;
-      transition: background .2s;
-    }
-    .slider::before {
-      content: '';
-      position: absolute;
-      width: 20px; height: 20px;
-      left: 3px; top: 3px;
-      background: var(--text);
-      border-radius: 50%;
-      transition: transform .2s;
-    }
-    .toggle input:checked + .slider { background: var(--accent); }
-    .toggle input:checked + .slider::before { transform: translateX(18px); }
-
-    /* ── Footer ── */
-    footer {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      padding: 12px 20px;
-      padding-bottom: calc(12px + var(--safe-bot));
-      background: linear-gradient(to top, var(--bg) 60%, transparent);
-      z-index: 10;
-    }
-
-    /* ── Toast ── */
-    .toast {
-      position: fixed;
-      top: calc(var(--safe-top) + 16px);
-      left: 50%; transform: translateX(-50%) translateY(-20px);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 10px 20px;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--text);
-      z-index: 9999;
-      opacity: 0;
-      transition: all .3s ease;
-      white-space: nowrap;
-      box-shadow: 0 8px 32px rgba(0,0,0,.5);
-    }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-    .toast.ok  { border-color: var(--success); color: var(--success); }
-    .toast.err { border-color: var(--accent2); color: var(--accent2); }
-
-    /* ── Section tabs ── */
-    .tabs {
-      display: flex;
-      gap: 4px;
-      padding: 4px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-    .tab {
-      flex: 1;
-      padding: 9px;
-      border: none;
-      border-radius: 7px;
-      background: transparent;
-      color: var(--muted);
-      font-family: var(--sans);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: .5px;
-      cursor: pointer;
-      transition: all .2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .tab.active {
-      background: var(--bg);
-      color: var(--accent);
-      box-shadow: 0 1px 6px rgba(0,0,0,.4);
-    }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: flex; flex-direction: column; gap: 20px; }
+      --bg:#0a0a0f;--surface:#111118;--border:#1e1e2e;--accent:#00e5ff;--accent2:#ff3c6e;
+      --text:#e8e8f0;--muted:#555570;--success:#00ff88;--warn:#ffcc00;
+      --mono:'Share Tech Mono',monospace;--sans:'Barlow',sans-serif;
+      --safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overscroll-behavior:none;-webkit-text-size-adjust:100%}
+    body{display:flex;flex-direction:column;min-height:100vh;min-height:-webkit-fill-available;padding-top:var(--safe-top);padding-bottom:var(--safe-bot)}
+    body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,.018) 2px,rgba(0,229,255,.018) 4px);pointer-events:none;z-index:1000}
+    header{padding:20px 24px 12px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+    header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+    .header-top{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+    .logo{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:bold;color:var(--bg);flex-shrink:0;box-shadow:0 0 16px rgba(0,229,255,.4)}
+    h1{font-size:18px;font-weight:700;letter-spacing:.5px;line-height:1.2}
+    h1 span{color:var(--accent)}
+    .subtitle{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding-left:48px}
+    main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:24px 20px 120px;display:flex;flex-direction:column;gap:20px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent)}
+    .card.accent2::before{background:linear-gradient(90deg,var(--accent2),transparent)}
+    .card-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+    .card-label::after{content:'';flex:1;height:1px;background:var(--border)}
+    .card.accent2 .card-label{color:var(--accent2)}
+    .field{margin-bottom:14px}.field:last-child{margin-bottom:0}
+    label{display:block;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    input[type="text"],input[type="url"],input[type="number"]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:14px;padding:12px 14px;outline:none;-webkit-appearance:none;appearance:none;transition:border-color .2s,box-shadow .2s}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,229,255,.15)}
+    input::placeholder{color:var(--muted);opacity:.7}
+    .ip-row{display:grid;grid-template-columns:1fr 80px;gap:8px}
+    .btn{width:100%;border:none;border-radius:10px;font-family:var(--sans);font-size:15px;font-weight:700;letter-spacing:.5px;padding:15px;cursor:pointer;transition:transform .1s,opacity .2s,box-shadow .2s;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden}
+    .btn:active{transform:scale(.97)}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+    .btn-primary{background:linear-gradient(135deg,var(--accent) 0%,#0099bb 100%);color:var(--bg);box-shadow:0 4px 20px rgba(0,229,255,.3)}
+    .btn-secondary{background:transparent;border:1px solid var(--border);color:var(--text)}
+    .btn-secondary:active{background:rgba(255,255,255,.04)}
+    .btn::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,rgba(255,255,255,.25) 0%,transparent 70%);opacity:0;transition:opacity .3s;pointer-events:none}
+    .btn.ripple::after{opacity:1}
+    .terminal{background:#070710;border:1px solid var(--border);border-radius:10px;padding:14px;font-family:var(--mono);font-size:12px;line-height:1.7;min-height:90px;max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .terminal-bar{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+    .terminal-dot{width:10px;height:10px;border-radius:50%}
+    .terminal-dot.red{background:#ff5f57}.terminal-dot.yellow{background:#febc2e}.terminal-dot.green{background:#28c840}
+    .terminal-title{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:auto;letter-spacing:1px}
+    .log-line{display:block;animation:fadeIn .2s ease}
+    .log-ok{color:var(--success)}.log-err{color:var(--accent2)}.log-warn{color:var(--warn)}.log-info{color:var(--accent)}.log-muted{color:var(--muted)}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+    .status-pill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:100px;border:1px solid var(--border);margin-bottom:14px}
+    .pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0}
+    .pulse-dot.active{background:var(--success);animation:pulse 1.2s infinite}
+    .pulse-dot.error{background:var(--accent2)}
+    @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,136,.5)}50%{opacity:.8;box-shadow:0 0 0 5px rgba(0,255,136,0)}}
+    .progress-wrap{display:none;margin-top:14px}.progress-wrap.show{display:block}
+    .progress-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:6px}
+    .progress-track{height:4px;background:var(--border);border-radius:100px;overflow:hidden}
+    .progress-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent),var(--success));width:0%;transition:width .4s ease}
+    .progress-fill.indeterminate{width:40%!important;animation:indeterminate 1.4s ease-in-out infinite}
+    @keyframes indeterminate{0%{transform:translateX(-200%)}100%{transform:translateX(400%)}}
+    .pkg-list{display:flex;flex-direction:column;gap:8px}
+    .pkg-item{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+    .pkg-item-num{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:20px}
+    .pkg-item-url{flex:1;font-family:var(--mono);font-size:11px;color:var(--text);word-break:break-all;line-height:1.4}
+    .pkg-remove{background:none;border:none;color:var(--accent2);font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+    .add-pkg-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+    .btn-add{background:var(--border);border:none;border-radius:8px;color:var(--text);font-size:20px;width:46px;height:46px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent;transition:background .2s}
+    .btn-add:active{background:var(--accent);color:var(--bg)}
+    .method-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+    .method-tab{padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--mono);font-size:11px;text-align:center;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;line-height:1.4}
+    .method-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,.08)}
+    .method-tab .port-badge{display:block;font-size:9px;color:var(--muted);margin-top:2px}
+    .method-tab.active .port-badge{color:rgba(0,229,255,.6)}
+    .gh-warning{display:none;background:rgba(255,204,0,.08);border:1px solid rgba(255,204,0,.3);border-radius:8px;padding:10px 12px;font-family:var(--mono);font-size:11px;color:var(--warn);line-height:1.6;margin-top:10px}
+    .gh-warning.show{display:block}
+    .hist-item{display:flex;align-items:flex-start;gap:10px;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;background:var(--bg);transition:border-color .2s;-webkit-tap-highlight-color:transparent}
+    .hist-item:last-child{margin-bottom:0}.hist-item:active{border-color:var(--accent)}
+    .hist-icon{color:var(--accent);font-size:14px;flex-shrink:0;margin-top:1px}
+    .hist-text{flex:1}.hist-ip{font-family:var(--mono);font-size:11px;color:var(--accent);margin-bottom:2px}
+    .hist-url{font-family:var(--mono);font-size:10px;color:var(--muted);word-break:break-all;line-height:1.4}
+    .hist-del{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+    .empty-hist{text-align:center;color:var(--muted);font-family:var(--mono);font-size:12px;padding:20px 0}
+    .accordion-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:2px 0}
+    .accordion-header .chevron{font-size:16px;color:var(--muted);transition:transform .3s}
+    .accordion-header.open .chevron{transform:rotate(180deg)}
+    .accordion-body{display:none;padding-top:14px}.accordion-body.open{display:block}
+    .toggle-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+    .toggle-row:last-child{border-bottom:none}
+    .toggle-label{font-size:13px;color:var(--text)}.toggle-desc{font-size:11px;color:var(--muted);margin-top:2px}
+    .toggle{position:relative;width:44px;height:26px;flex-shrink:0}
+    .toggle input{opacity:0;width:0;height:0}
+    .slider{position:absolute;inset:0;background:var(--border);border-radius:100px;cursor:pointer;transition:background .2s}
+    .slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:var(--text);border-radius:50%;transition:transform .2s}
+    .toggle input:checked+.slider{background:var(--accent)}.toggle input:checked+.slider::before{transform:translateX(18px)}
+    footer{position:fixed;bottom:0;left:0;right:0;padding:12px 20px;padding-bottom:calc(12px + var(--safe-bot));background:linear-gradient(to top,var(--bg) 60%,transparent);z-index:10}
+    .toast{position:fixed;top:calc(var(--safe-top) + 16px);left:50%;transform:translateX(-50%) translateY(-20px);background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:10px 20px;font-family:var(--mono);font-size:12px;color:var(--text);z-index:9999;opacity:0;transition:all .3s ease;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .toast.ok{border-color:var(--success);color:var(--success)}.toast.err{border-color:var(--accent2);color:var(--accent2)}
+    .tabs{display:flex;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:20px}
+    .tab{flex:1;padding:9px;border:none;border-radius:7px;background:transparent;color:var(--muted);font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.5px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+    .tab.active{background:var(--bg);color:var(--accent);box-shadow:0 1px 6px rgba(0,0,0,.4)}
+    .tab-panel{display:none}.tab-panel.active{display:flex;flex-direction:column;gap:20px}
   </style>
-
 </head>
 <body>
-
 <header>
   <div class="header-top">
     <div class="logo">PS4</div>
-    <div>
-      <h1>PKG <span>Installer</span></h1>
-    </div>
+    <div><h1>PKG <span>Installer</span></h1></div>
   </div>
   <div class="subtitle">Direct Download Mode · iOS Port</div>
 </header>
-
 <main>
-  <!-- Top tabs -->
   <div class="tabs">
     <button class="tab active" onclick="switchTab('install')">Install</button>
     <button class="tab" onclick="switchTab('history')">History</button>
     <button class="tab" onclick="switchTab('settings')">Settings</button>
   </div>
 
-  <!-- ══ INSTALL TAB ══ -->
-
+  <!-- INSTALL TAB -->
   <div class="tab-panel active" id="tab-install">
+    <div class="card">
+      <div class="card-label">Target Console</div>
+      <div class="status-pill" id="statusPill">
+        <div class="pulse-dot" id="pulseDot"></div>
+        <span id="statusText">Not connected</span>
+      </div>
+      <div class="field">
+        <label>PS4 IP Address</label>
+        <div class="ip-row">
+          <input type="text" id="ps4ip" placeholder="192.168.1.xxx" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" />
+          <input type="number" id="ps4port" placeholder="port" inputmode="numeric" min="1" max="65535" value="12800" />
+        </div>
+      </div>
+      <button class="btn btn-secondary" onclick="pingPS4()" id="btnPing">⚡ Test Connection</button>
+    </div>
 
-```
-<!-- PS4 Target -->
-<div class="card">
-  <div class="card-label">Target Console</div>
+    <div class="card">
+      <div class="card-label">Install Method</div>
+      <div class="method-tabs">
+        <button class="method-tab active" id="methodRPI" onclick="setMethod('rpi')">
+          RPI<span class="port-badge">port 12800</span>
+        </button>
+        <button class="method-tab" id="methodGH" onclick="setMethod('goldhen')">
+          GoldHEN<span class="port-badge">port 9090</span>
+        </button>
+      </div>
+      <div id="methodHint" style="font-size:11px;color:var(--muted);line-height:1.5;"></div>
+      <div class="gh-warning" id="ghWarning">⚠ GoldHEN only installs one package at a time.<br>Multiple URLs added — only the first will be sent.</div>
+    </div>
 
-  <div class="status-pill" id="statusPill">
-    <div class="pulse-dot" id="pulseDot"></div>
-    <span id="statusText">Not connected</span>
-  </div>
+    <div class="card accent2">
+      <div class="card-label">Package URLs</div>
+      <div class="pkg-list" id="pkgList"></div>
+      <div class="add-pkg-row" style="margin-top:10px;">
+        <div class="field" style="margin-bottom:0;">
+          <label>Add PKG URL</label>
+          <input type="url" id="pkgInput" placeholder="https://example.com/game.pkg" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" />
+        </div>
+        <button class="btn-add" onclick="addPKG()">＋</button>
+      </div>
+    </div>
 
-  <div class="field">
-    <label>PS4 IP Address</label>
-    <div class="ip-row">
-      <input type="text" id="ps4ip" placeholder="192.168.1.xxx"
-        inputmode="decimal" autocomplete="off" autocorrect="off"
-        spellcheck="false" />
-      <input type="number" id="ps4port" placeholder="12800"
-        inputmode="numeric" min="1" max="65535" value="12800" />
+    <div class="card">
+      <div class="card-label">Console Output</div>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <span class="terminal-title">DPI-iOS v1.0</span>
+        </div>
+        <div id="logOutput"><span class="log-muted log-line">// Waiting for input...</span></div>
+      </div>
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-label"><span>Sending to PS4...</span><span id="progressPct"></span></div>
+        <div class="progress-track"><div class="progress-fill indeterminate" id="progressFill"></div></div>
+      </div>
     </div>
   </div>
 
-  <button class="btn btn-secondary" onclick="pingPS4()" id="btnPing">
-    ⚡ Test Connection
-  </button>
-</div>
-
-<!-- Method -->
-<div class="card">
-  <div class="card-label">Install Method</div>
-  <div class="method-tabs">
-    <button class="method-tab active" id="methodRPI" onclick="setMethod('rpi')">
-      RPI
-      <span class="port-badge">port 12800</span>
-    </button>
-    <button class="method-tab" id="methodGH" onclick="setMethod('goldhen')">
-      GoldHEN
-      <span class="port-badge">port 12800</span>
-    </button>
-  </div>
-  <div id="methodHint" style="font-size:11px;color:var(--muted);line-height:1.5;">
-    Uses Remote Package Installer homebrew. Open RPI on your PS4, paste the PKG URL below and hit Install.
-  </div>
-</div>
-
-<!-- PKG URLs -->
-<div class="card accent2">
-  <div class="card-label">Package URLs</div>
-
-  <div class="pkg-list" id="pkgList"></div>
-
-  <div class="add-pkg-row" style="margin-top:10px;">
-    <div class="field" style="margin-bottom:0;">
-      <label>Add PKG URL</label>
-      <input type="url" id="pkgInput"
-        placeholder="https://example.com/game.pkg"
-        autocomplete="off" autocorrect="off"
-        autocapitalize="none" spellcheck="false" />
-    </div>
-    <button class="btn-add" onclick="addPKG()" title="Add URL">＋</button>
-  </div>
-</div>
-
-<!-- Terminal -->
-<div class="card">
-  <div class="card-label">Console Output</div>
-  <div class="terminal">
-    <div class="terminal-bar">
-      <div class="terminal-dot red"></div>
-      <div class="terminal-dot yellow"></div>
-      <div class="terminal-dot green"></div>
-      <span class="terminal-title">DPI-iOS v1.0</span>
-    </div>
-    <div id="logOutput">
-      <span class="log-muted log-line">// Waiting for input...</span>
-    </div>
-  </div>
-  <div class="progress-wrap" id="progressWrap">
-    <div class="progress-label">
-      <span id="progressLabel">Sending to PS4...</span>
-      <span id="progressPct"></span>
-    </div>
-    <div class="progress-track">
-      <div class="progress-fill indeterminate" id="progressFill"></div>
-    </div>
-  </div>
-</div>
-```
-
-  </div><!-- /tab-install -->
-
-  <!-- ══ HISTORY TAB ══ -->
-
+  <!-- HISTORY TAB -->
   <div class="tab-panel" id="tab-history">
     <div class="card">
       <div class="card-label">Recent Installs</div>
-      <div id="historyList">
-        <div class="empty-hist">// No history yet</div>
-      </div>
-      <button class="btn btn-secondary" style="margin-top:14px;" onclick="clearHistory()">
-        Clear History
-      </button>
+      <div id="historyList"><div class="empty-hist">// No history yet</div></div>
+      <button class="btn btn-secondary" style="margin-top:14px;" onclick="clearHistory()">Clear History</button>
     </div>
   </div>
 
-  <!-- ══ SETTINGS TAB ══ -->
-
+  <!-- SETTINGS TAB -->
   <div class="tab-panel" id="tab-settings">
     <div class="card">
       <div class="card-label">Preferences</div>
-
-```
-  <div class="toggle-row">
-    <div>
-      <div class="toggle-label">Remember PS4 IP</div>
-      <div class="toggle-desc">Auto-fill IP on launch</div>
+      <div class="toggle-row">
+        <div><div class="toggle-label">Remember PS4 IP</div><div class="toggle-desc">Auto-fill IP on launch</div></div>
+        <label class="toggle"><input type="checkbox" id="settRememberIP" checked onchange="saveSetting('rememberIP',this.checked)" /><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="toggle-label">Save History</div><div class="toggle-desc">Keep a log of sent URLs</div></div>
+        <label class="toggle"><input type="checkbox" id="settHistory" checked onchange="saveSetting('saveHistory',this.checked)" /><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="toggle-label">Confirm Before Send</div><div class="toggle-desc">Show confirmation dialog</div></div>
+        <label class="toggle"><input type="checkbox" id="settConfirm" onchange="saveSetting('confirmSend',this.checked)" /><span class="slider"></span></label>
+      </div>
     </div>
-    <label class="toggle">
-      <input type="checkbox" id="settRememberIP" checked onchange="saveSetting('rememberIP',this.checked)" />
-      <span class="slider"></span>
-    </label>
-  </div>
-
-  <div class="toggle-row">
-    <div>
-      <div class="toggle-label">Save History</div>
-      <div class="toggle-desc">Keep a log of sent URLs</div>
+    <div class="card">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="card-label" style="margin-bottom:0;">How To Use</div>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="accordion-body">
+        <div style="font-size:13px;line-height:1.8;color:var(--muted);">
+          <b style="color:var(--text);">1.</b> PS4 and iPhone must be on the same Wi-Fi.<br>
+          <b style="color:var(--text);">2.</b> <b style="color:var(--accent);">RPI:</b> Open Remote Package Installer on PS4.<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<b style="color:var(--accent);">GoldHEN:</b> Just have GoldHEN running (no extra app).<br>
+          <b style="color:var(--text);">3.</b> Enter PS4 IP. Port auto-sets per method.<br>
+          <b style="color:var(--text);">4.</b> Paste a direct <code style="color:var(--accent2);">.pkg</code> URL and tap Install.<br>
+          <b style="color:var(--text);">5.</b> PS4 downloads on its own. You can close this app.
+        </div>
+      </div>
     </div>
-    <label class="toggle">
-      <input type="checkbox" id="settHistory" checked onchange="saveSetting('saveHistory',this.checked)" />
-      <span class="slider"></span>
-    </label>
-  </div>
-
-  <div class="toggle-row">
-    <div>
-      <div class="toggle-label">Confirm Before Send</div>
-      <div class="toggle-desc">Show confirmation dialog</div>
+    <div class="card">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="card-label" style="margin-bottom:0;">Troubleshooting</div>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="accordion-body">
+        <div style="font-size:12px;line-height:1.8;color:var(--muted);">
+          <b style="color:var(--warn);">Connection refused</b> → RPI not open / GoldHEN not running.<br>
+          <b style="color:var(--warn);">Wrong port</b> → RPI=12800, GoldHEN=9090. Method auto-sets it.<br>
+          <b style="color:var(--warn);">Invalid payload</b> → RPI needs type+packages[], GoldHEN needs install string.<br>
+          <b style="color:var(--warn);">CORS / Blocked</b> → Open via HTTP only, not HTTPS.<br>
+          <b style="color:var(--warn);">Timeout</b> → Wrong IP address.
+        </div>
+      </div>
     </div>
-    <label class="toggle">
-      <input type="checkbox" id="settConfirm" onchange="saveSetting('confirmSend',this.checked)" />
-      <span class="slider"></span>
-    </label>
-  </div>
-</div>
-
-<div class="card">
-  <div class="accordion-header" onclick="toggleAccordion(this)">
-    <div class="card-label" style="margin-bottom:0;">How To Use</div>
-    <span class="chevron">⌄</span>
-  </div>
-  <div class="accordion-body">
-    <div style="font-size:13px;line-height:1.8;color:var(--muted);">
-      <b style="color:var(--text);">1.</b> Make sure your PS4 and iPhone are on the same Wi-Fi network.<br>
-      <b style="color:var(--text);">2.</b> On PS4, open <b style="color:var(--accent);">Remote Package Installer</b> (or ensure GoldHEN is running).<br>
-      <b style="color:var(--text);">3.</b> Enter your PS4's IP address above.<br>
-      <b style="color:var(--text);">4.</b> Paste a direct <code style="color:var(--accent2);">.pkg</code> URL (must be a direct download link — not Google Drive, not Mediafire).<br>
-      <b style="color:var(--text);">5.</b> Tap <b style="color:var(--accent);">Install</b>. Done. The PS4 downloads it on its own.
-    </div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="accordion-header" onclick="toggleAccordion(this)">
-    <div class="card-label" style="margin-bottom:0;">Troubleshooting</div>
-    <span class="chevron">⌄</span>
-  </div>
-  <div class="accordion-body">
-    <div style="font-size:12px;line-height:1.8;color:var(--muted);">
-      <b style="color:var(--warn);">Connection refused</b> → RPI not open / GoldHEN not running.<br>
-      <b style="color:var(--warn);">Network error</b> → PS4 and phone on different networks. Check Wi-Fi.<br>
-      <b style="color:var(--warn);">Invalid JSON</b> → PS4 returned an error. Try a different PKG URL.<br>
-      <b style="color:var(--warn);">CORS / Blocked</b> → You're accessing this page via HTTPS. Open it via HTTP only.<br>
-      <b style="color:var(--warn);">Timeout</b> → Wrong IP address entered.
+    <div class="card" style="text-align:center;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.8;">
+        PS4 PKG Installer — iOS Port<br>Based on DirectPackageInstaller by marcussacana<br>
+        <span style="color:var(--border);">───────────────────</span><br>RPI API by flatz · GPL-3.0
+      </div>
     </div>
   </div>
-</div>
-
-<div class="card" style="text-align:center;">
-  <div style="font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.8;">
-    PS4 PKG Installer — iOS Port<br>
-    Based on DirectPackageInstaller by marcussacana<br>
-    <span style="color:var(--border);">───────────────────</span><br>
-    RPI API by flatz · GPL-3.0
-  </div>
-</div>
-```
-
-  </div>
-
 </main>
 
-<!-- Fixed bottom button -->
-
 <footer>
-  <button class="btn btn-primary" id="btnInstall" onclick="install()" disabled>
-    ▶ Install on PS4
-  </button>
+  <button class="btn btn-primary" id="btnInstall" onclick="install()" disabled>▶ Install on PS4</button>
 </footer>
-
 <div class="toast" id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════ */
-let pkgURLs   = [];
-let method    = 'rpi';
-let isBusy    = false;
-let settings  = { rememberIP: true, saveHistory: true, confirmSend: false };
-let history   = [];
+let pkgURLs  = [];
+let method   = 'rpi';
+let isBusy   = false;
+let settings = { rememberIP:true, saveHistory:true, confirmSend:false };
+let history  = [];
 
-/* ═══════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════ */
-(function init() {
+const METHOD_CONFIG = {
+  rpi:     { port:'12800', pingPath:'/api/is_exists', pingMethod:'POST', pingBody:()=>JSON.stringify({title_id:'CUSA00000'}), installPath:'/api/install', buildBody:(urls)=>JSON.stringify({type:'direct',packages:urls}) },
+  goldhen: { port:'9090',  pingPath:'/',              pingMethod:'GET',  pingBody:()=>null,                                   installPath:'/install',     buildBody:(urls)=>JSON.stringify({install:urls[0]}) }
+};
+
+(function init(){
   try {
-    const s = JSON.parse(localStorage.getItem('dpi_settings') || '{}');
-    Object.assign(settings, s);
-    const h = JSON.parse(localStorage.getItem('dpi_history') || '[]');
-    history = h;
-
+    Object.assign(settings, JSON.parse(localStorage.getItem('dpi_settings')||'{}'));
+    history = JSON.parse(localStorage.getItem('dpi_history')||'[]');
     document.getElementById('settRememberIP').checked = settings.rememberIP;
     document.getElementById('settHistory').checked    = settings.saveHistory;
     document.getElementById('settConfirm').checked    = settings.confirmSend;
-
-    if (settings.rememberIP) {
-      const ip   = localStorage.getItem('dpi_ip')   || '';
-      const port = localStorage.getItem('dpi_port') || '12800';
-      if (ip) document.getElementById('ps4ip').value   = ip;
-      document.getElementById('ps4port').value = port;
+    if(settings.rememberIP){
+      const ip = localStorage.getItem('dpi_ip')||'';
+      if(ip) document.getElementById('ps4ip').value = ip;
     }
-
-    const savedMethod = localStorage.getItem('dpi_method') || 'rpi';
-    setMethod(savedMethod, false);
-
+    setMethod(localStorage.getItem('dpi_method')||'rpi', false);
     renderHistory();
-  } catch(e) {}
-
+  } catch(e){}
   document.getElementById('ps4ip').addEventListener('input', onIPChange);
-  document.getElementById('pkgInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); addPKG(); }
-  });
+  document.getElementById('pkgInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){e.preventDefault();addPKG();} });
 })();
 
-/* ═══════════════════════════════════════════
-   TABS
-═══════════════════════════════════════════ */
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    const names = ['install','history','settings'];
-    t.classList.toggle('active', names[i] === name);
-  });
-  document.querySelectorAll('.tab-panel').forEach(p => {
-    p.classList.toggle('active', p.id === 'tab-' + name);
-  });
-  if (name === 'history') renderHistory();
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['install','history','settings'][i]===name));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+name));
+  if(name==='history') renderHistory();
 }
 
-/* ═══════════════════════════════════════════
-   METHOD
-═══════════════════════════════════════════ */
-function setMethod(m, save = true) {
+function setMethod(m, save=true){
   method = m;
-  document.getElementById('methodRPI').classList.toggle('active', m === 'rpi');
-  document.getElementById('methodGH').classList.toggle('active', m === 'goldhen');
-  const hints = {
-    rpi:     'Uses Remote Package Installer homebrew. Open RPI on your PS4, then tap Install.',
-    goldhen: 'Uses GoldHEN\'s built-in installer. Make sure GoldHEN is running on your PS4 (no extra app needed).'
-  };
-  document.getElementById('methodHint').textContent = hints[m];
-  if (save) localStorage.setItem('dpi_method', m);
+  const cfg = METHOD_CONFIG[m];
+  document.getElementById('methodRPI').classList.toggle('active', m==='rpi');
+  document.getElementById('methodGH').classList.toggle('active', m==='goldhen');
+  document.getElementById('ps4port').value = cfg.port;
+  document.getElementById('methodHint').textContent = m==='rpi'
+    ? 'Uses Remote Package Installer homebrew. Open RPI on your PS4. Supports multiple packages.'
+    : 'Uses GoldHEN payload server (port 9090). Make sure GoldHEN is running. One package at a time.';
+  updateGHWarning();
+  if(save) localStorage.setItem('dpi_method', m);
 }
 
-/* ═══════════════════════════════════════════
-   PKG LIST
-═══════════════════════════════════════════ */
-function addPKG() {
+function updateGHWarning(){
+  document.getElementById('ghWarning').classList.toggle('show', method==='goldhen' && pkgURLs.length>1);
+}
+
+function addPKG(){
   const input = document.getElementById('pkgInput');
   const url   = input.value.trim();
-  if (!url) return;
-  if (!url.startsWith('http')) {
-    showToast('URL must start with http:// or https://', 'err');
-    return;
-  }
+  if(!url) return;
+  if(!url.startsWith('http')){ showToast('URL must start with http','err'); return; }
   pkgURLs.push(url);
   input.value = '';
-  renderPKGs();
-  updateInstallBtn();
-  log(`<span class="log-info">+ Added:</span> <span style="color:var(--text)">${truncate(url, 50)}</span>`);
+  renderPKGs(); updateInstallBtn(); updateGHWarning();
+  log(`<span class="log-info">+ Added:</span> <span style="color:var(--text)">${truncate(url,50)}</span>`);
 }
 
-function removePKG(i) {
-  pkgURLs.splice(i, 1);
-  renderPKGs();
-  updateInstallBtn();
-}
+function removePKG(i){ pkgURLs.splice(i,1); renderPKGs(); updateInstallBtn(); updateGHWarning(); }
 
-function renderPKGs() {
+function renderPKGs(){
   const list = document.getElementById('pkgList');
-  if (!pkgURLs.length) { list.innerHTML = ''; return; }
-  list.innerHTML = pkgURLs.map((u, i) => `
+  if(!pkgURLs.length){ list.innerHTML=''; return; }
+  list.innerHTML = pkgURLs.map((u,i)=>`
     <div class="pkg-item">
       <span class="pkg-item-num">#${i+1}</span>
       <span class="pkg-item-url">${escHtml(u)}</span>
       <button class="pkg-remove" onclick="removePKG(${i})">✕</button>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-/* ═══════════════════════════════════════════
-   PING
-═══════════════════════════════════════════ */
-async function pingPS4() {
+async function pingPS4(){
   const ip   = document.getElementById('ps4ip').value.trim();
-  const port = document.getElementById('ps4port').value.trim() || '12800';
-  if (!ip) { showToast('Enter PS4 IP first', 'err'); return; }
-
+  const port = document.getElementById('ps4port').value.trim() || METHOD_CONFIG[method].port;
+  if(!ip){ showToast('Enter PS4 IP first','err'); return; }
   const btn = document.getElementById('btnPing');
-  btn.disabled = true; btn.textContent = '⚡ Pinging...';
-  setStatus('pinging', 'Pinging...');
-  log('<span class="log-info">→</span> Testing connection to ' + ip + ':' + port + '...');
-
-  const url = buildURL(ip, port, '/api/is_exists');
+  btn.disabled=true; btn.textContent='⚡ Pinging...';
+  setStatus('pinging','Pinging...');
+  log(`<span class="log-info">→</span> Testing ${method.toUpperCase()} at ${ip}:${port}...`);
+  const cfg = METHOD_CONFIG[method];
   try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 5000);
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title_id: 'CUSA00000' }),
-      signal: ctrl.signal
-    });
+    const ctrl  = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), 5000);
+    const opts  = { method:cfg.pingMethod, signal:ctrl.signal, headers:{'Content-Type':'application/json'} };
+    if(cfg.pingBody()) opts.body = cfg.pingBody();
+    const res = await fetch(`http://${ip}:${port}${cfg.pingPath}`, opts);
     clearTimeout(timer);
-    // RPI returns 200 even for "not found" — any response = PS4 is alive
-    log('<span class="log-ok">✓ PS4 responded!</span> Status ' + res.status);
-    setStatus('ok', 'Connected · ' + ip);
-    showToast('PS4 is reachable ✓', 'ok');
-    if (settings.rememberIP) {
-      localStorage.setItem('dpi_ip', ip);
-      localStorage.setItem('dpi_port', port);
-    }
-  } catch(e) {
-    const msg = e.name === 'AbortError' ? 'Timeout — check IP' : simplifyError(e);
-    log('<span class="log-err">✗ Failed:</span> ' + msg);
-    setStatus('err', 'Unreachable');
-    showToast('Cannot reach PS4', 'err');
+    log(`<span class="log-ok">✓ PS4 responded!</span> HTTP ${res.status}`);
+    setStatus('ok',`Connected · ${ip}`);
+    showToast('PS4 is reachable ✓','ok');
+    if(settings.rememberIP) localStorage.setItem('dpi_ip', ip);
+  } catch(e){
+    const msg = e.name==='AbortError' ? 'Timeout — check IP/port' : simplifyError(e);
+    log(`<span class="log-err">✗ Failed:</span> ${msg}`);
+    setStatus('err','Unreachable');
+    showToast('Cannot reach PS4','err');
   }
-  btn.disabled = false; btn.textContent = '⚡ Test Connection';
+  btn.disabled=false; btn.textContent='⚡ Test Connection';
 }
 
-/* ═══════════════════════════════════════════
-   INSTALL
-═══════════════════════════════════════════ */
-async function install() {
-  if (isBusy) return;
+async function install(){
+  if(isBusy) return;
   const ip   = document.getElementById('ps4ip').value.trim();
-  const port = document.getElementById('ps4port').value.trim() || '12800';
+  const port = document.getElementById('ps4port').value.trim() || METHOD_CONFIG[method].port;
+  if(!ip)             { showToast('Enter PS4 IP address','err'); return; }
+  if(!pkgURLs.length) { showToast('Add at least one PKG URL','err'); return; }
+  if(settings.confirmSend && !confirm(`Send to ${ip}:${port} via ${method.toUpperCase()}?`)) return;
 
-  if (!ip)            { showToast('Enter PS4 IP address', 'err'); return; }
-  if (!pkgURLs.length){ showToast('Add at least one PKG URL', 'err'); return; }
+  isBusy=true; setStatus('pinging','Sending...'); showProgress(true);
+  document.getElementById('btnInstall').disabled=true;
 
-  if (settings.confirmSend) {
-    if (!confirm(`Send ${pkgURLs.length} package(s) to ${ip}?`)) return;
-  }
-
-  isBusy = true;
-  setStatus('pinging', 'Sending...');
-  showProgress(true);
-  document.getElementById('btnInstall').disabled = true;
-
+  const cfg = METHOD_CONFIG[method];
   log('<span class="log-info">══ Starting install ══</span>');
-  log('<span class="log-muted">Target:</span> ' + ip + ':' + port);
-  log('<span class="log-muted">Packages:</span> ' + pkgURLs.length);
-  pkgURLs.forEach((u,i) => log(`  <span class="log-muted">[${i+1}]</span> ${truncate(u,55)}`));
+  log(`<span class="log-muted">Method:</span> ${method.toUpperCase()} · ${ip}:${port}`);
+  log(`<span class="log-muted">Packages:</span> ${pkgURLs.length}`);
+  pkgURLs.forEach((u,i)=>log(`  <span class="log-muted">[${i+1}]</span> ${truncate(u,55)}`));
 
-  const url  = buildURL(ip, port, '/api/install');
-  const body = JSON.stringify({ type: 'direct', packages: pkgURLs });
+  if(method==='goldhen' && pkgURLs.length>1)
+    log('<span class="log-warn">⚠ GoldHEN: sending first package only.</span>');
 
-  log('<span class="log-info">→</span> POST ' + url);
+  const url  = `http://${ip}:${port}${cfg.installPath}`;
+  const body = cfg.buildBody(pkgURLs);
+  log(`<span class="log-info">→</span> POST ${url}`);
 
   try {
     const ctrl  = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 10000);
-
-    const res  = await fetch(url, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body,
-      signal: ctrl.signal
+    const timer = setTimeout(()=>ctrl.abort(), 10000);
+    const res   = await fetch(url, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body, signal:ctrl.signal
     });
     clearTimeout(timer);
-
-    let json;
-    try { json = await res.json(); } catch { json = null; }
-
-    if (res.ok || (json && json.status === 'success')) {
-      log('<span class="log-ok">✓ PS4 accepted the package(s)!</span>');
-      log('<span class="log-muted">The PS4 is now downloading directly.</span>');
-      log('<span class="log-muted">You can close this app — PS4 handles the rest.</span>');
-      showToast('Sent to PS4 ✓ Downloading...', 'ok');
-      setStatus('ok', 'Downloading on PS4');
-      if (settings.saveHistory) saveHistory(ip, port, pkgURLs);
+    let json; try{ json=await res.json(); }catch{ json=null; }
+    const ok = res.ok || (json && ['success','ok'].includes(json.status));
+    if(ok){
+      log('<span class="log-ok">✓ PS4 accepted the package!</span>');
+      log('<span class="log-muted">PS4 is now downloading. You can close this app.</span>');
+      showToast('Sent ✓ PS4 is downloading...','ok');
+      setStatus('ok','Downloading on PS4');
+      if(settings.saveHistory) saveToHistory(ip, port, pkgURLs);
     } else {
-      const errMsg = json?.error || json?.status || ('HTTP ' + res.status);
-      log('<span class="log-err">✗ PS4 returned error:</span> ' + errMsg);
-      showToast('PS4 error: ' + errMsg, 'err');
-      setStatus('err', 'Install failed');
+      const errMsg = json?.error || json?.message || json?.status || ('HTTP '+res.status);
+      log(`<span class="log-err">✗ PS4 error:</span> ${errMsg}`);
+      showToast('PS4 error: '+errMsg,'err');
+      setStatus('err','Install failed');
     }
-  } catch(e) {
-    const msg = e.name === 'AbortError' ? 'Request timed out' : simplifyError(e);
-    log('<span class="log-err">✗ Network error:</span> ' + msg);
-    if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
-      log('<span class="log-warn">⚠ If you see CORS/mixed-content errors:</span>');
-      log('<span class="log-warn">  Open this page via HTTP, not HTTPS.</span>');
-    }
-    showToast('Error: ' + msg, 'err');
-    setStatus('err', 'Network error');
+  } catch(e){
+    const msg = e.name==='AbortError' ? 'Request timed out' : simplifyError(e);
+    log(`<span class="log-err">✗ Network error:</span> ${msg}`);
+    if(msg.includes('network')||msg.includes('fetch'))
+      log('<span class="log-warn">⚠ Open this page via HTTP, not HTTPS.</span>');
+    showToast('Error: '+msg,'err');
+    setStatus('err','Network error');
   }
-
-  isBusy = false;
-  showProgress(false);
-  document.getElementById('btnInstall').disabled = false;
+  isBusy=false; showProgress(false);
+  document.getElementById('btnInstall').disabled=false; updateInstallBtn();
 }
 
-/* ═══════════════════════════════════════════
-   HELPERS
-═══════════════════════════════════════════ */
-function buildURL(ip, port, path) {
-  // Always HTTP — never HTTPS — so no mixed-content block from Safari
-  return `http://${ip}:${port}${path}`;
+function onIPChange(){ const ip=document.getElementById('ps4ip').value.trim(); setStatus('idle',ip?'Ready · '+ip:'Not connected'); updateInstallBtn(); }
+function updateInstallBtn(){ document.getElementById('btnInstall').disabled=!document.getElementById('ps4ip').value.trim()||!pkgURLs.length||isBusy; }
+function setStatus(state,text){ document.getElementById('pulseDot').className='pulse-dot'+(state==='ok'?' active':state==='err'?' error':''); document.getElementById('statusText').textContent=text; }
+function log(html){ const out=document.getElementById('logOutput'); const l=document.createElement('span'); l.className='log-line'; l.innerHTML=html; out.appendChild(l); out.appendChild(document.createElement('br')); out.parentElement.scrollTop=out.parentElement.scrollHeight; }
+function showProgress(show){ document.getElementById('progressWrap').classList.toggle('show',show); }
+function showToast(msg,type=''){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show '+type; clearTimeout(t._timer); t._timer=setTimeout(()=>{t.className='toast';},3000); }
+function truncate(str,n){ return str.length>n?str.slice(0,n)+'…':str; }
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function simplifyError(e){ const m=e.message||String(e); if(m.includes('Failed to fetch')||m.includes('NetworkError')) return 'Cannot reach PS4 (network error)'; if(m.includes('CORS')) return 'CORS blocked — open via HTTP'; if(m.includes('refused')) return 'Connection refused — is '+(method==='goldhen'?'GoldHEN':'RPI')+' running?'; return m.slice(0,60); }
+function saveSetting(key,val){ settings[key]=val; localStorage.setItem('dpi_settings',JSON.stringify(settings)); }
+
+function saveToHistory(ip,port,pkgs){
+  if(!settings.saveHistory) return;
+  history.unshift({ip,port,method,pkgs:[...pkgs],ts:Date.now()});
+  if(history.length>30) history.pop();
+  localStorage.setItem('dpi_history',JSON.stringify(history));
 }
-
-function onIPChange() {
-  const ip = document.getElementById('ps4ip').value.trim();
-  setStatus('idle', ip ? 'Ready · ' + ip : 'Not connected');
-  updateInstallBtn();
-}
-
-function updateInstallBtn() {
-  const ip = document.getElementById('ps4ip').value.trim();
-  document.getElementById('btnInstall').disabled = !ip || !pkgURLs.length || isBusy;
-}
-
-function setStatus(state, text) {
-  const dot  = document.getElementById('pulseDot');
-  const span = document.getElementById('statusText');
-  dot.className   = 'pulse-dot' + (state === 'ok' ? ' active' : state === 'err' ? ' error' : '');
-  span.textContent = text;
-}
-
-function log(html) {
-  const out  = document.getElementById('logOutput');
-  const line = document.createElement('span');
-  line.className   = 'log-line';
-  line.innerHTML   = html;
-  out.appendChild(line);
-  out.appendChild(document.createElement('br'));
-  out.parentElement.scrollTop = out.parentElement.scrollHeight;
-}
-
-function showProgress(show) {
-  document.getElementById('progressWrap').classList.toggle('show', show);
-}
-
-function showToast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className   = 'toast show ' + type;
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
-}
-
-function truncate(str, n) { return str.length > n ? str.slice(0, n) + '…' : str; }
-function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function simplifyError(e) {
-  const m = e.message || String(e);
-  if (m.includes('Failed to fetch') || m.includes('NetworkError')) return 'Cannot reach PS4 (network error)';
-  if (m.includes('CORS'))      return 'CORS blocked — open via HTTP';
-  if (m.includes('refused'))   return 'Connection refused — is RPI / GoldHEN running?';
-  return m.slice(0, 60);
-}
-
-function saveSetting(key, val) {
-  settings[key] = val;
-  localStorage.setItem('dpi_settings', JSON.stringify(settings));
-}
-
-/* ═══════════════════════════════════════════
-   HISTORY
-═══════════════════════════════════════════ */
-function saveHistory(ip, port, pkgs) {
-  if (!settings.saveHistory) return;
-  const entry = { ip, port, pkgs: [...pkgs], ts: Date.now() };
-  history.unshift(entry);
-  if (history.length > 30) history.pop();
-  localStorage.setItem('dpi_history', JSON.stringify(history));
-}
-
-function renderHistory() {
-  const el = document.getElementById('historyList');
-  if (!history.length) {
-    el.innerHTML = '<div class="empty-hist">// No history yet</div>';
-    return;
-  }
-  el.innerHTML = history.map((h, i) => `
+function renderHistory(){
+  const el=document.getElementById('historyList');
+  if(!history.length){ el.innerHTML='<div class="empty-hist">// No history yet</div>'; return; }
+  el.innerHTML=history.map((h,i)=>`
     <div class="hist-item" onclick="loadFromHistory(${i})">
       <span class="hist-icon">⟳</span>
       <div class="hist-text">
-        <div class="hist-ip">${escHtml(h.ip)}:${escHtml(String(h.port))}</div>
-        <div class="hist-url">${h.pkgs.map(p => escHtml(truncate(p, 55))).join('<br>')}</div>
+        <div class="hist-ip">${escHtml(h.ip)}:${escHtml(String(h.port))} <span style="color:var(--muted);font-size:9px;">[${(h.method||'rpi').toUpperCase()}]</span></div>
+        <div class="hist-url">${h.pkgs.map(p=>escHtml(truncate(p,55))).join('<br>')}</div>
       </div>
       <button class="hist-del" onclick="event.stopPropagation();deleteHistory(${i})">✕</button>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
-
-function loadFromHistory(i) {
-  const h = history[i];
-  document.getElementById('ps4ip').value   = h.ip;
-  document.getElementById('ps4port').value = h.port;
-  pkgURLs = [...h.pkgs];
-  renderPKGs();
-  updateInstallBtn();
-  switchTab('install');
-  showToast('Loaded from history', 'ok');
-}
-
-function deleteHistory(i) {
-  history.splice(i, 1);
-  localStorage.setItem('dpi_history', JSON.stringify(history));
-  renderHistory();
-}
-
-function clearHistory() {
-  if (!history.length) return;
-  if (confirm('Clear all install history?')) {
-    history = [];
-    localStorage.setItem('dpi_history', JSON.stringify(history));
-    renderHistory();
-    showToast('History cleared');
-  }
-}
-
-/* ═══════════════════════════════════════════
-   ACCORDION
-═══════════════════════════════════════════ */
-function toggleAccordion(header) {
-  header.classList.toggle('open');
-  header.nextElementSibling.classList.toggle('open');
-}
-
-/* ═══════════════════════════════════════════
-   RIPPLE
-═══════════════════════════════════════════ */
-document.querySelectorAll('.btn').forEach(b => {
-  b.addEventListener('click', function() {
-    this.classList.add('ripple');
-    setTimeout(() => this.classList.remove('ripple'), 400);
-  });
-});
+function loadFromHistory(i){ const h=history[i]; document.getElementById('ps4ip').value=h.ip; pkgURLs=[...h.pkgs]; setMethod(h.method||'rpi',false); renderPKGs(); updateInstallBtn(); updateGHWarning(); switchTab('install'); showToast('Loaded from history','ok'); }
+function deleteHistory(i){ history.splice(i,1); localStorage.setItem('dpi_history',JSON.stringify(history)); renderHistory(); }
+function clearHistory(){ if(!history.length) return; if(confirm('Clear all install history?')){ history=[]; localStorage.setItem('dpi_history',JSON.stringify(history)); renderHistory(); showToast('History cleared'); } }
+function toggleAccordion(h){ h.classList.toggle('open'); h.nextElementSibling.classList.toggle('open'); }
+document.querySelectorAll('.btn').forEach(b=>b.addEventListener('click',function(){ this.classList.add('ripple'); setTimeout(()=>this.classList.remove('ripple'),400); }));
 </script>
-
 </body>
 </html>
