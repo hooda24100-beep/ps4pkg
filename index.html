@@ -1,3 +1,5 @@
+Here’s the full code:
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -126,20 +128,16 @@
     <button class="tab" onclick="switchTab('settings')">Settings</button>
   </div>
 
-  <!-- INSTALL TAB -->
   <div class="tab-panel active" id="tab-install">
     <div class="card">
       <div class="card-label">Target Console</div>
-      <div class="status-pill" id="statusPill">
+      <div class="status-pill">
         <div class="pulse-dot" id="pulseDot"></div>
         <span id="statusText">Not connected</span>
       </div>
       <div class="field">
         <label>PS4 IP Address</label>
-        <div class="ip-row">
-          <input type="text" id="ps4ip" placeholder="192.168.1.xxx" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" />
-          <input type="number" id="ps4port" placeholder="port" inputmode="numeric" min="1" max="65535" value="12800" />
-        </div>
+        <input type="text" id="ps4ip" placeholder="192.168.1.xxx" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" />
       </div>
       <button class="btn btn-secondary" onclick="pingPS4()" id="btnPing">⚡ Test Connection</button>
     </div>
@@ -147,15 +145,11 @@
     <div class="card">
       <div class="card-label">Install Method</div>
       <div class="method-tabs">
-        <button class="method-tab active" id="methodRPI" onclick="setMethod('rpi')">
-          RPI<span class="port-badge">port 12800</span>
-        </button>
-        <button class="method-tab" id="methodGH" onclick="setMethod('goldhen')">
-          GoldHEN<span class="port-badge">port 9090</span>
-        </button>
+        <button class="method-tab active" id="methodRPI" onclick="setMethod('rpi')">RPI<span class="port-badge">port 12800</span></button>
+        <button class="method-tab" id="methodGH" onclick="setMethod('goldhen')">GoldHEN<span class="port-badge">port 9090</span></button>
       </div>
-      <div id="methodHint" style="font-size:11px;color:var(--muted);line-height:1.5;"></div>
-      <div class="gh-warning" id="ghWarning">⚠ GoldHEN only installs one package at a time.<br>Multiple URLs added — only the first will be sent.</div>
+      <div id="methodHint" style="font-size:11px;color:var(--muted);line-height:1.6;"></div>
+      <div class="gh-warning" id="ghWarning">⚠ GoldHEN only supports one package at a time. Only the first URL will be sent.</div>
     </div>
 
     <div class="card accent2">
@@ -182,13 +176,12 @@
         <div id="logOutput"><span class="log-muted log-line">// Waiting for input...</span></div>
       </div>
       <div class="progress-wrap" id="progressWrap">
-        <div class="progress-label"><span>Sending to PS4...</span><span id="progressPct"></span></div>
-        <div class="progress-track"><div class="progress-fill indeterminate" id="progressFill"></div></div>
+        <div class="progress-label"><span>Sending to PS4...</span></div>
+        <div class="progress-track"><div class="progress-fill indeterminate"></div></div>
       </div>
     </div>
   </div>
 
-  <!-- HISTORY TAB -->
   <div class="tab-panel" id="tab-history">
     <div class="card">
       <div class="card-label">Recent Installs</div>
@@ -197,7 +190,6 @@
     </div>
   </div>
 
-  <!-- SETTINGS TAB -->
   <div class="tab-panel" id="tab-settings">
     <div class="card">
       <div class="card-label">Preferences</div>
@@ -216,39 +208,25 @@
     </div>
     <div class="card">
       <div class="accordion-header" onclick="toggleAccordion(this)">
-        <div class="card-label" style="margin-bottom:0;">How To Use</div>
-        <span class="chevron">⌄</span>
-      </div>
-      <div class="accordion-body">
-        <div style="font-size:13px;line-height:1.8;color:var(--muted);">
-          <b style="color:var(--text);">1.</b> PS4 and iPhone must be on the same Wi-Fi.<br>
-          <b style="color:var(--text);">2.</b> <b style="color:var(--accent);">RPI:</b> Open Remote Package Installer on PS4.<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;<b style="color:var(--accent);">GoldHEN:</b> Just have GoldHEN running (no extra app).<br>
-          <b style="color:var(--text);">3.</b> Enter PS4 IP. Port auto-sets per method.<br>
-          <b style="color:var(--text);">4.</b> Paste a direct <code style="color:var(--accent2);">.pkg</code> URL and tap Install.<br>
-          <b style="color:var(--text);">5.</b> PS4 downloads on its own. You can close this app.
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="accordion-header" onclick="toggleAccordion(this)">
         <div class="card-label" style="margin-bottom:0;">Troubleshooting</div>
         <span class="chevron">⌄</span>
       </div>
       <div class="accordion-body">
-        <div style="font-size:12px;line-height:1.8;color:var(--muted);">
-          <b style="color:var(--warn);">Connection refused</b> → RPI not open / GoldHEN not running.<br>
-          <b style="color:var(--warn);">Wrong port</b> → RPI=12800, GoldHEN=9090. Method auto-sets it.<br>
-          <b style="color:var(--warn);">Invalid payload</b> → RPI needs type+packages[], GoldHEN needs install string.<br>
-          <b style="color:var(--warn);">CORS / Blocked</b> → Open via HTTP only, not HTTPS.<br>
-          <b style="color:var(--warn);">Timeout</b> → Wrong IP address.
+        <div style="font-size:12px;line-height:1.9;color:var(--muted);">
+          <b style="color:var(--warn);">Cannot reach PS4</b> → Wrong IP, or RPI/GoldHEN not running.<br>
+          <b style="color:var(--warn);">Wrong port</b> → RPI = 12800 · GoldHEN = 9090 (auto-set).<br>
+          <b style="color:var(--warn);">Invalid payload</b> → Make sure you picked the right method.<br>
+          <b style="color:var(--warn);">CORS / blocked</b> → Must open via <b style="color:var(--accent);">HTTP</b> not HTTPS.<br>
+          <b style="color:var(--warn);">PS4 not downloading</b> → URL must be a direct .pkg link.
         </div>
       </div>
     </div>
     <div class="card" style="text-align:center;">
       <div style="font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.8;">
-        PS4 PKG Installer — iOS Port<br>Based on DirectPackageInstaller by marcussacana<br>
-        <span style="color:var(--border);">───────────────────</span><br>RPI API by flatz · GPL-3.0
+        PS4 PKG Installer — iOS Port<br>
+        Based on DirectPackageInstaller by marcussacana<br>
+        <span style="color:var(--border);">───────────────────</span><br>
+        RPI API by flatz · GPL-3.0
       </div>
     </div>
   </div>
@@ -260,27 +238,27 @@
 <div class="toast" id="toast"></div>
 
 <script>
-let pkgURLs  = [];
-let method   = 'rpi';
-let isBusy   = false;
+let pkgURLs = [];
+let method  = 'rpi';
+let isBusy  = false;
 let settings = { rememberIP:true, saveHistory:true, confirmSend:false };
-let history  = [];
+let installHistory = [];
 
-const METHOD_CONFIG = {
-  rpi:     { port:'12800', pingPath:'/api/is_exists', pingMethod:'POST', pingBody:()=>JSON.stringify({title_id:'CUSA00000'}), installPath:'/api/install', buildBody:(urls)=>JSON.stringify({type:'direct',packages:urls}) },
-  goldhen: { port:'9090',  pingPath:'/',              pingMethod:'GET',  pingBody:()=>null,                                   installPath:'/install',     buildBody:(urls)=>JSON.stringify({install:urls[0]}) }
+const METHODS = {
+  rpi:     { port:'12800', installPath:'/api/install', buildBody:(urls)=>JSON.stringify({type:'direct',packages:urls}) },
+  goldhen: { port:'9090',  installPath:'/install',     buildBody:(urls)=>JSON.stringify({install:urls[0]}) }
 };
 
 (function init(){
   try {
     Object.assign(settings, JSON.parse(localStorage.getItem('dpi_settings')||'{}'));
-    history = JSON.parse(localStorage.getItem('dpi_history')||'[]');
+    installHistory = JSON.parse(localStorage.getItem('dpi_history')||'[]');
     document.getElementById('settRememberIP').checked = settings.rememberIP;
     document.getElementById('settHistory').checked    = settings.saveHistory;
     document.getElementById('settConfirm').checked    = settings.confirmSend;
     if(settings.rememberIP){
-      const ip = localStorage.getItem('dpi_ip')||'';
-      if(ip) document.getElementById('ps4ip').value = ip;
+      const savedIP = localStorage.getItem('dpi_ip')||'';
+      if(savedIP) document.getElementById('ps4ip').value = savedIP;
     }
     setMethod(localStorage.getItem('dpi_method')||'rpi', false);
     renderHistory();
@@ -290,45 +268,42 @@ const METHOD_CONFIG = {
 })();
 
 function switchTab(name){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['install','history','settings'][i]===name));
+  ['install','history','settings'].forEach((n,i)=>document.querySelectorAll('.tab')[i].classList.toggle('active',n===name));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+name));
   if(name==='history') renderHistory();
 }
 
 function setMethod(m, save=true){
-  method = m;
-  const cfg = METHOD_CONFIG[m];
-  document.getElementById('methodRPI').classList.toggle('active', m==='rpi');
-  document.getElementById('methodGH').classList.toggle('active', m==='goldhen');
-  document.getElementById('ps4port').value = cfg.port;
+  method=m;
+  document.getElementById('methodRPI').classList.toggle('active',m==='rpi');
+  document.getElementById('methodGH').classList.toggle('active',m==='goldhen');
   document.getElementById('methodHint').textContent = m==='rpi'
-    ? 'Uses Remote Package Installer homebrew. Open RPI on your PS4. Supports multiple packages.'
-    : 'Uses GoldHEN payload server (port 9090). Make sure GoldHEN is running. One package at a time.';
+    ? 'Remote Package Installer homebrew. Open RPI on your PS4 first. Supports multiple packages.'
+    : 'GoldHEN built-in installer. Just have GoldHEN running — no extra app needed. One package at a time.';
   updateGHWarning();
-  if(save) localStorage.setItem('dpi_method', m);
+  if(save) localStorage.setItem('dpi_method',m);
 }
 
 function updateGHWarning(){
-  document.getElementById('ghWarning').classList.toggle('show', method==='goldhen' && pkgURLs.length>1);
+  document.getElementById('ghWarning').classList.toggle('show', method==='goldhen'&&pkgURLs.length>1);
 }
 
 function addPKG(){
-  const input = document.getElementById('pkgInput');
-  const url   = input.value.trim();
+  const input=document.getElementById('pkgInput');
+  const url=input.value.trim();
   if(!url) return;
-  if(!url.startsWith('http')){ showToast('URL must start with http','err'); return; }
-  pkgURLs.push(url);
-  input.value = '';
+  if(!url.startsWith('http')){showToast('URL must start with http','err');return;}
+  pkgURLs.push(url); input.value='';
   renderPKGs(); updateInstallBtn(); updateGHWarning();
-  log(`<span class="log-info">+ Added:</span> <span style="color:var(--text)">${truncate(url,50)}</span>`);
+  log(`<span class="log-info">+</span> ${truncate(url,55)}`);
 }
 
 function removePKG(i){ pkgURLs.splice(i,1); renderPKGs(); updateInstallBtn(); updateGHWarning(); }
 
 function renderPKGs(){
-  const list = document.getElementById('pkgList');
-  if(!pkgURLs.length){ list.innerHTML=''; return; }
-  list.innerHTML = pkgURLs.map((u,i)=>`
+  const list=document.getElementById('pkgList');
+  if(!pkgURLs.length){list.innerHTML='';return;}
+  list.innerHTML=pkgURLs.map((u,i)=>`
     <div class="pkg-item">
       <span class="pkg-item-num">#${i+1}</span>
       <span class="pkg-item-url">${escHtml(u)}</span>
@@ -337,124 +312,103 @@ function renderPKGs(){
 }
 
 async function pingPS4(){
-  const ip   = document.getElementById('ps4ip').value.trim();
-  const port = document.getElementById('ps4port').value.trim() || METHOD_CONFIG[method].port;
-  if(!ip){ showToast('Enter PS4 IP first','err'); return; }
-  const btn = document.getElementById('btnPing');
+  const ip=document.getElementById('ps4ip').value.trim();
+  if(!ip){showToast('Enter PS4 IP first','err');return;}
+  const port=METHODS[method].port;
+  const btn=document.getElementById('btnPing');
   btn.disabled=true; btn.textContent='⚡ Pinging...';
   setStatus('pinging','Pinging...');
-  log(`<span class="log-info">→</span> Testing ${method.toUpperCase()} at ${ip}:${port}...`);
-  const cfg = METHOD_CONFIG[method];
+  log(`<span class="log-info">→</span> Pinging ${method.toUpperCase()} at ${ip}:${port}...`);
   try {
-    const ctrl  = new AbortController();
-    const timer = setTimeout(()=>ctrl.abort(), 5000);
-    const opts  = { method:cfg.pingMethod, signal:ctrl.signal, headers:{'Content-Type':'application/json'} };
-    if(cfg.pingBody()) opts.body = cfg.pingBody();
-    const res = await fetch(`http://${ip}:${port}${cfg.pingPath}`, opts);
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),5000);
+    const res=await fetch(`http://${ip}:${port}${METHODS[method].installPath}`,{
+      method:'POST', headers:{'Content-Type':'application/json'}, body:'{}', signal:ctrl.signal
+    });
     clearTimeout(timer);
-    log(`<span class="log-ok">✓ PS4 responded!</span> HTTP ${res.status}`);
+    log(`<span class="log-ok">✓ PS4 is reachable!</span> HTTP ${res.status}`);
     setStatus('ok',`Connected · ${ip}`);
     showToast('PS4 is reachable ✓','ok');
-    if(settings.rememberIP) localStorage.setItem('dpi_ip', ip);
+    if(settings.rememberIP) localStorage.setItem('dpi_ip',ip);
   } catch(e){
-    const msg = e.name==='AbortError' ? 'Timeout — check IP/port' : simplifyError(e);
-    log(`<span class="log-err">✗ Failed:</span> ${msg}`);
+    if(e.name==='AbortError'){
+      log(`<span class="log-err">✗ Timeout</span> — no response from ${ip}:${port}`);
+      showToast('Timeout — check IP','err');
+    } else {
+      log(`<span class="log-err">✗ Cannot reach PS4:</span> ${simplifyError(e)}`);
+      showToast('Cannot reach PS4','err');
+    }
     setStatus('err','Unreachable');
-    showToast('Cannot reach PS4','err');
   }
   btn.disabled=false; btn.textContent='⚡ Test Connection';
 }
 
 async function install(){
   if(isBusy) return;
-  const ip   = document.getElementById('ps4ip').value.trim();
-  const port = document.getElementById('ps4port').value.trim() || METHOD_CONFIG[method].port;
-  if(!ip)             { showToast('Enter PS4 IP address','err'); return; }
-  if(!pkgURLs.length) { showToast('Add at least one PKG URL','err'); return; }
-  if(settings.confirmSend && !confirm(`Send to ${ip}:${port} via ${method.toUpperCase()}?`)) return;
-
+  const ip=document.getElementById('ps4ip').value.trim();
+  if(!ip){showToast('Enter PS4 IP address','err');return;}
+  if(!pkgURLs.length){showToast('Add at least one PKG URL','err');return;}
+  if(settings.confirmSend&&!confirm(`Send to ${ip} via ${method.toUpperCase()}?`)) return;
+  const cfg=METHODS[method];
+  const url=`http://${ip}:${cfg.port}${cfg.installPath}`;
+  const body=cfg.buildBody(pkgURLs);
   isBusy=true; setStatus('pinging','Sending...'); showProgress(true);
   document.getElementById('btnInstall').disabled=true;
-
-  const cfg = METHOD_CONFIG[method];
-  log('<span class="log-info">══ Starting install ══</span>');
-  log(`<span class="log-muted">Method:</span> ${method.toUpperCase()} · ${ip}:${port}`);
-  log(`<span class="log-muted">Packages:</span> ${pkgURLs.length}`);
-  pkgURLs.forEach((u,i)=>log(`  <span class="log-muted">[${i+1}]</span> ${truncate(u,55)}`));
-
-  if(method==='goldhen' && pkgURLs.length>1)
-    log('<span class="log-warn">⚠ GoldHEN: sending first package only.</span>');
-
-  const url  = `http://${ip}:${port}${cfg.installPath}`;
-  const body = cfg.buildBody(pkgURLs);
+  log(`<span class="log-info">══ Install · ${method.toUpperCase()} ══</span>`);
+  log(`<span class="log-muted">Target:</span> ${ip}:${cfg.port}`);
+  pkgURLs.forEach((u,i)=>log(`<span class="log-muted">[${i+1}]</span> ${truncate(u,52)}`));
+  if(method==='goldhen'&&pkgURLs.length>1) log(`<span class="log-warn">⚠ GoldHEN: only sending [1]</span>`);
   log(`<span class="log-info">→</span> POST ${url}`);
-
   try {
-    const ctrl  = new AbortController();
-    const timer = setTimeout(()=>ctrl.abort(), 10000);
-    const res   = await fetch(url, {
-      method:'POST', headers:{'Content-Type':'application/json'}, body, signal:ctrl.signal
-    });
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),10000);
+    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body,signal:ctrl.signal});
     clearTimeout(timer);
-    let json; try{ json=await res.json(); }catch{ json=null; }
-    const ok = res.ok || (json && ['success','ok'].includes(json.status));
+    let json=null; try{json=await res.json();}catch{}
+    const ok=res.ok||(json&&['success','ok'].includes((json.status||'').toLowerCase()));
     if(ok){
-      log('<span class="log-ok">✓ PS4 accepted the package!</span>');
-      log('<span class="log-muted">PS4 is now downloading. You can close this app.</span>');
-      showToast('Sent ✓ PS4 is downloading...','ok');
+      log(`<span class="log-ok">✓ Accepted! PS4 is now downloading.</span>`);
+      log(`<span class="log-muted">You can close this app.</span>`);
+      showToast('Sent ✓ PS4 downloading...','ok');
       setStatus('ok','Downloading on PS4');
-      if(settings.saveHistory) saveToHistory(ip, port, pkgURLs);
+      if(settings.saveHistory) pushHistory(ip,pkgURLs);
     } else {
-      const errMsg = json?.error || json?.message || json?.status || ('HTTP '+res.status);
+      const errMsg=json?.error||json?.message||json?.status||`HTTP ${res.status}`;
       log(`<span class="log-err">✗ PS4 error:</span> ${errMsg}`);
       showToast('PS4 error: '+errMsg,'err');
-      setStatus('err','Install failed');
+      setStatus('err','Failed');
     }
   } catch(e){
-    const msg = e.name==='AbortError' ? 'Request timed out' : simplifyError(e);
-    log(`<span class="log-err">✗ Network error:</span> ${msg}`);
-    if(msg.includes('network')||msg.includes('fetch'))
-      log('<span class="log-warn">⚠ Open this page via HTTP, not HTTPS.</span>');
-    showToast('Error: '+msg,'err');
+    if(e.name==='AbortError'){
+      log(`<span class="log-err">✗ Timed out</span>`);
+      showToast('Timed out','err');
+    } else {
+      const msg=simplifyError(e);
+      log(`<span class="log-err">✗ Network error:</span> ${msg}`);
+      if(msg.includes('network')||msg.includes('fetch'))
+        log(`<span class="log-warn">⚠ Open via HTTP not HTTPS</span>`);
+      showToast('Error: '+msg,'err');
+    }
     setStatus('err','Network error');
   }
-  isBusy=false; showProgress(false);
-  document.getElementById('btnInstall').disabled=false; updateInstallBtn();
+  isBusy=false; showProgress(false); updateInstallBtn();
 }
 
 function onIPChange(){ const ip=document.getElementById('ps4ip').value.trim(); setStatus('idle',ip?'Ready · '+ip:'Not connected'); updateInstallBtn(); }
 function updateInstallBtn(){ document.getElementById('btnInstall').disabled=!document.getElementById('ps4ip').value.trim()||!pkgURLs.length||isBusy; }
 function setStatus(state,text){ document.getElementById('pulseDot').className='pulse-dot'+(state==='ok'?' active':state==='err'?' error':''); document.getElementById('statusText').textContent=text; }
 function log(html){ const out=document.getElementById('logOutput'); const l=document.createElement('span'); l.className='log-line'; l.innerHTML=html; out.appendChild(l); out.appendChild(document.createElement('br')); out.parentElement.scrollTop=out.parentElement.scrollHeight; }
-function showProgress(show){ document.getElementById('progressWrap').classList.toggle('show',show); }
-function showToast(msg,type=''){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show '+type; clearTimeout(t._timer); t._timer=setTimeout(()=>{t.className='toast';},3000); }
-function truncate(str,n){ return str.length>n?str.slice(0,n)+'…':str; }
+function showProgress(v){ document.getElementById('progressWrap').classList.toggle('show',v); }
+function showToast(msg,type=''){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show '+type; clearTimeout(t._t); t._t=setTimeout(()=>{t.className='toast';},3000); }
+function truncate(s,n){ return s.length>n?s.slice(0,n)+'…':s; }
 function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function simplifyError(e){ const m=e.message||String(e); if(m.includes('Failed to fetch')||m.includes('NetworkError')) return 'Cannot reach PS4 (network error)'; if(m.includes('CORS')) return 'CORS blocked — open via HTTP'; if(m.includes('refused')) return 'Connection refused — is '+(method==='goldhen'?'GoldHEN':'RPI')+' running?'; return m.slice(0,60); }
+function simplifyError(e){ const m=e.message||String(e); if(m.includes('Failed to fetch')||m.includes('NetworkError')) return 'network error — check HTTP vs HTTPS'; if(m.includes('refused')) return 'connection refused — is '+(method==='goldhen'?'GoldHEN':'RPI')+' running?'; return m.slice(0,80); }
 function saveSetting(key,val){ settings[key]=val; localStorage.setItem('dpi_settings',JSON.stringify(settings)); }
-
-function saveToHistory(ip,port,pkgs){
-  if(!settings.saveHistory) return;
-  history.unshift({ip,port,method,pkgs:[...pkgs],ts:Date.now()});
-  if(history.length>30) history.pop();
-  localStorage.setItem('dpi_history',JSON.stringify(history));
-}
-function renderHistory(){
-  const el=document.getElementById('historyList');
-  if(!history.length){ el.innerHTML='<div class="empty-hist">// No history yet</div>'; return; }
-  el.innerHTML=history.map((h,i)=>`
-    <div class="hist-item" onclick="loadFromHistory(${i})">
-      <span class="hist-icon">⟳</span>
-      <div class="hist-text">
-        <div class="hist-ip">${escHtml(h.ip)}:${escHtml(String(h.port))} <span style="color:var(--muted);font-size:9px;">[${(h.method||'rpi').toUpperCase()}]</span></div>
-        <div class="hist-url">${h.pkgs.map(p=>escHtml(truncate(p,55))).join('<br>')}</div>
-      </div>
-      <button class="hist-del" onclick="event.stopPropagation();deleteHistory(${i})">✕</button>
-    </div>`).join('');
-}
-function loadFromHistory(i){ const h=history[i]; document.getElementById('ps4ip').value=h.ip; pkgURLs=[...h.pkgs]; setMethod(h.method||'rpi',false); renderPKGs(); updateInstallBtn(); updateGHWarning(); switchTab('install'); showToast('Loaded from history','ok'); }
-function deleteHistory(i){ history.splice(i,1); localStorage.setItem('dpi_history',JSON.stringify(history)); renderHistory(); }
-function clearHistory(){ if(!history.length) return; if(confirm('Clear all install history?')){ history=[]; localStorage.setItem('dpi_history',JSON.stringify(history)); renderHistory(); showToast('History cleared'); } }
+function pushHistory(ip,pkgs){ if(!settings.saveHistory) return; installHistory.unshift({ip,method,pkgs:[...pkgs],ts:Date.now()}); if(installHistory.length>30) installHistory.pop(); localStorage.setItem('dpi_history',JSON.stringify(installHistory)); }
+function renderHistory(){ const el=document.getElementById('historyList'); if(!installHistory.length){el.innerHTML='<div class="empty-hist">// No history yet</div>';return;} el.innerHTML=installHistory.map((h,i)=>`<div class="hist-item" onclick="loadHistory(${i})"><span class="hist-icon">⟳</span><div class="hist-text"><div class="hist-ip">${escHtml(h.ip)} <span style="color:var(--muted);font-size:9px;">[${(h.method||'rpi').toUpperCase()}]</span></div><div class="hist-url">${h.pkgs.map(p=>escHtml(truncate(p,52))).join('<br>')}</div></div><button class="hist-del" onclick="event.stopPropagation();delHistory(${i})">✕</button></div>`).join(''); }
+function loadHistory(i){ const h=installHistory[i]; document.getElementById('ps4ip').value=h.ip; pkgURLs=[...h.pkgs]; setMethod(h.method||'rpi',false); renderPKGs(); updateInstallBtn(); updateGHWarning(); switchTab('install'); showToast('Loaded from history','ok'); }
+function delHistory(i){ installHistory.splice(i,1); localStorage.setItem('dpi_history',JSON.stringify(installHistory)); renderHistory(); }
+function clearHistory(){ if(!installHistory.length) return; if(confirm('Clear all history?')){ installHistory=[]; localStorage.setItem('dpi_history',JSON.stringify(installHistory)); renderHistory(); showToast('History cleared'); } }
 function toggleAccordion(h){ h.classList.toggle('open'); h.nextElementSibling.classList.toggle('open'); }
 document.querySelectorAll('.btn').forEach(b=>b.addEventListener('click',function(){ this.classList.add('ripple'); setTimeout(()=>this.classList.remove('ripple'),400); }));
 </script>
